@@ -1,0 +1,6 @@
+{
+  "name": "FitBase Fitness Center",
+  "description": "FitBase Fitness Center — Strength, conditioning, class schedules, member performance & fee verification portal, and management console.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

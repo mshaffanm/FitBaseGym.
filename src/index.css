@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background-color: #09090b;
+    color: #f4f4f5;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Unified dark editorial color grade applied across all real facility photos */
+.gym-media-frame {
+  position: relative;
+  overflow: hidden;
+  background-color: #09090b;
+}
+
+.gym-media-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(250, 204, 21, 0.04) 0%, rgba(9, 9, 11, 0.42) 100%),
+    linear-gradient(180deg, rgba(9, 9, 11, 0.24) 0%, rgba(9, 9, 11, 0.08) 45%, rgba(9, 9, 11, 0.86) 100%);
+}
+
+.gym-media-filter {
+  filter: brightness(0.82) contrast(1.14) saturate(0.72) sepia(0.08) hue-rotate(-6deg);
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), filter 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, filter;
+}
+
+.group:hover .gym-media-filter,
+.gym-media-filter:hover {
+  filter: brightness(0.91) contrast(1.16) saturate(0.84) sepia(0.04) hue-rotate(-4deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
