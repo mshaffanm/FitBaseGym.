@@ -103,7 +103,7 @@ export function AdminPortal({
 
   const showToast = (msg: string) => {
     setToast(msg);
-    window.setTimeout(() => setToast(null), 4000);
+    window.setTimeout(() => setToast(null), 8000);
   };
 
   const fetchAdminData = useCallback(async () => {
@@ -479,7 +479,11 @@ export function AdminPortal({
           </div>
 
           {toast && (
-            <div className="mt-4 rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-xs font-medium text-white">
+            <div
+          role="status"
+          aria-live="polite"
+          className="fixed left-1/2 top-4 z-[100] w-[92vw] max-w-xl -translate-x-1/2 rounded-lg border border-zinc-600 bg-zinc-900 px-4 py-3 text-sm font-medium text-white shadow-2xl shadow-black/70"
+        >
               {toast}
             </div>
           )}
