@@ -59,3 +59,35 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- Responsive + popup fixes ---------- */
+html { -webkit-text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+img, video, canvas, svg { max-width: 100%; }
+
+/* Popups: never taller than the screen. The popup scrolls inside itself, so
+   the title, close button and Save/Cancel buttons are always reachable. */
+[role="dialog"] {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: max(0.75rem, env(safe-area-inset-top)) 0.75rem max(0.75rem, env(safe-area-inset-bottom));
+}
+[role="dialog"] > :is(form, div):not(.overflow-hidden) {
+  max-height: calc(100dvh - 1.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@media (min-width: 640px) {
+  [role="dialog"] { padding: 1rem; }
+  [role="dialog"] > :is(form, div):not(.overflow-hidden) { max-height: calc(100dvh - 2rem); }
+}
+/* Slightly tighter popups on short laptop screens (e.g. 1366x768) */
+@media (max-height: 800px) {
+  [role="dialog"] > :is(form, div):not(.overflow-hidden) { padding-top: 1rem; padding-bottom: 1rem; }
+}
+
+/* Phones: 16px inputs stop iOS from zooming on focus; comfortable tap targets */
+@media (max-width: 640px) {
+  input, select, textarea { font-size: 16px !important; }
+  button, [role="button"] { min-height: 40px; }
+}

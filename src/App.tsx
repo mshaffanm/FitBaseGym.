@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { api, getAuthToken, signOutSession } from './api';
+import { api, getAuthToken, setAuthToken } from './api';
 import { Navbar } from './components/Navbar';
 import { HomePage } from './components/HomePage';
 import { AuthModal } from './components/AuthModal';
@@ -16,7 +16,6 @@ export default function App() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [authPortal, setAuthPortal] = useState<PortalTarget>('member');
-  const [authError, setAuthError] = useState('');
   const [preselectedTier, setPreselectedTier] = useState<MembershipTier>('Official Package');
 
   const [classes, setClasses] = useState<GymClass[]>([]);
@@ -34,22 +33,12 @@ export default function App() {
   const loadPublicData = useCallback(async () => {
     try {
       const overview = await api.getPublicOverview();
-      setClasses(overview.classes);
-      setTrainers(overview.trainers);
-      setTiers(overview.tiers);
+      setClasses(Array.isArray(overview.classes) ? overview.classes : []);
+      setTrainers(Array.isArray(overview.trainers) ? overview.trainers : []);
+      if (overview.tiers) setTiers(overview.tiers);
     } catch {
       // Public overview retryable
     }
-  }, []);
-
-  const handleMembershipExpired = useCallback(() => {
-    signOutSession();
-    setCurrentUser(null);
-    setView('home');
-    setAuthPortal('member');
-    setAuthMode('login');
-    setAuthError('Membership Expired.');
-    setAuthModalOpen(true);
   }, []);
 
   useEffect(() => {
@@ -62,14 +51,8 @@ export default function App() {
           if (active) {
             setCurrentUser(user);
           }
-        } catch (err) {
-          signOutSession();
-          if (active && err instanceof Error && err.message.includes('Membership Expired')) {
-            setAuthPortal('member');
-            setAuthMode('login');
-            setAuthError('Membership Expired.');
-            setAuthModalOpen(true);
-          }
+        } catch {
+          setAuthToken(null);
         }
       }
       if (active) {
@@ -89,7 +72,6 @@ export default function App() {
   ) => {
     setAuthPortal(targetPortal);
     setAuthMode(targetPortal === 'member' ? mode : 'login');
-    setAuthError('');
     if (tier) setPreselectedTier(tier);
     setAuthModalOpen(true);
   };
@@ -104,7 +86,6 @@ export default function App() {
   };
 
   const handleAuthenticated = (user: UserProfile) => {
-    setAuthError('');
     setCurrentUser(user);
     setAuthModalOpen(false);
     setView('portal');
@@ -112,11 +93,10 @@ export default function App() {
   };
 
   const handleSignOut = () => {
-    signOutSession();
+    setAuthToken(null);
     setCurrentUser(null);
-    setAuthError('');
     setView('home');
-    void loadPublicData();
+    loadPublicData();
   };
 
   const handleNavigateSection = (sectionId: string) => {
@@ -149,10 +129,9 @@ export default function App() {
       return (
         <AdminPortal
           currentUser={currentUser}
-          onTrainersChanged={loadPublicData}
           onBackToSite={() => {
             setView('home');
-            void loadPublicData();
+            loadPublicData();
           }}
           onSignOut={handleSignOut}
         />
@@ -165,7 +144,7 @@ export default function App() {
           currentUser={currentUser}
           onBackToSite={() => {
             setView('home');
-            void loadPublicData();
+            loadPublicData();
           }}
           onSignOut={handleSignOut}
         />
@@ -176,10 +155,9 @@ export default function App() {
       <MemberPortal
         currentUser={currentUser}
         onUserUpdated={setCurrentUser}
-        onMembershipExpired={handleMembershipExpired}
         onBackToSite={() => {
           setView('home');
-          void loadPublicData();
+          loadPublicData();
         }}
         onSignOut={handleSignOut}
       />
@@ -211,12 +189,8 @@ export default function App() {
         <AuthModal
           initialMode={authMode}
           initialPortal={authPortal}
-          initialError={authError}
           preselectedTier={preselectedTier}
-          onClose={() => {
-            setAuthModalOpen(false);
-            setAuthError('');
-          }}
+          onClose={() => setAuthModalOpen(false)}
           onAuthenticated={handleAuthenticated}
         />
       )}
